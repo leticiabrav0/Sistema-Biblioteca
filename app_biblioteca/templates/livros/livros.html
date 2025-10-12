@@ -1,0 +1,6 @@
+{% for livro in livros %}
+    <div>
+        <h3>{{ livro.titulo }}</h3>
+        <p>Autor: {{ livro.autor.nome }}</p>
+    </div>
+{% endfor %}

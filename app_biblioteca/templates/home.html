@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+    <form action="{% url 'listagem_usuarios' %}" method="post">
+        {% csrf_token %}
+        <div class="container">
+            <h1>Biblioteca</h1>
+            Nome de Usuário: <input name="nome_usuario" type="text">
+            Senha: <input name="senha_usuario" type="password">
+            <button>Entrar</button>
+        </div>
+    </form>
+{% endblock %}
