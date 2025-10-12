@@ -1,10 +1,12 @@
-from django.urls import path
-from app_biblioteca import views
+# projeto_biblioteca/urls.py
+
+from django.contrib import admin
+from django.urls import path, include # A palavra 'include' é a chave aqui
 
 urlpatterns = [
-    #rota, view, nome de referencia
-    path('', views.home, name='home'),
-    #path('usuarios/', views.usuario, name='listagem_usuarios'),
-    path('livros/', views.livro_list, name='livro_list'),
-    #path('livros/create/', views.livro_create, name='livro_create'),
+    path('admin/', admin.site.urls),
+
+    # Esta linha diz: "Para qualquer rota que não seja '/admin/', 
+    # vá procurar as respostas no arquivo urls.py de app_biblioteca"
+    path('', include('app_biblioteca.urls')),
 ]

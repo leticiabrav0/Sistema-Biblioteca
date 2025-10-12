@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
 {% block conteudo %}
-    <form action="{% url 'listagem_usuarios' %}" method="post">
-        {% csrf_token %}
-        <div class="container">
-            <h1>Biblioteca</h1>
-            Nome de Usuário: <input name="nome_usuario" type="text">
-            Senha: <input name="senha_usuario" type="password">
-            <button>Entrar</button>
-        </div>
-    </form>
+<div class="container mt-4">
+    <h1>Bem-vindo(a) à Biblioteca, {{ user.username }}!</h1>
+    <p>Você está logado com sucesso.</p>
+
+    <ul>
+        <li>Ver lista de livros</li>
+        <li>Meus empréstimos</li>
+    </ul>
+
+    <a href="{% url 'logout' %}" class="btn btn-danger">Sair (Logout)</a>
+</div>
 {% endblock %}
