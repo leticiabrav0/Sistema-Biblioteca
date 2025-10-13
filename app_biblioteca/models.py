@@ -21,7 +21,7 @@ class Autor(models.Model):
 class Livro(models.Model):
     titulo = models.CharField(max_length=200)
     autor = models.ForeignKey(Autor, on_delete=models.CASCADE)
-    data_lancamento = models.DateField()
+    ano_publicacao = models.PositiveIntegerField()
     estoque = models.IntegerField()
 
     def __str__(self):
