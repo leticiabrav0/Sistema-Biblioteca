@@ -5,8 +5,8 @@
     <p>Você está logado com sucesso.</p>
 
     <ul>
-        <li>Ver lista de livros</li>
-        <li>Meus empréstimos</li>
+        <li><a href="{% url 'listar_livros' %}">Ver lista de livros</a></li>
+        <li><a href="{% url 'listar_emprestimos_ativos' %}">Painel de Devoluções (Funcionário)</a></li>
     </ul>
 
     <a href="{% url 'logout' %}" class="btn btn-danger">Sair (Logout)</a>

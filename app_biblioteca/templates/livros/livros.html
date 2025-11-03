@@ -1,6 +1,43 @@
-{% for livro in livros %}
-    <div>
-        <h3>{{ livro.titulo }}</h3>
-        <p>Autor: {{ livro.autor.nome }}</p>
-    </div>
-{% endfor %}
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="container mt-4">
+    <h1>Catálogo de Livros</h1>
+    <hr>
+    
+    {% if livros %}
+        <div class="row">
+            {% for livro in livros %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ livro.titulo }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ livro.autor.nome }}</h6>
+                        <p class="card-text">
+                            <strong>Ano:</strong> {{ livro.ano_publicacao }}<br>
+                            <strong>Estoque:</strong> {{ livro.estoque }}
+                        </p>
+
+                        {% if livro.estoque > 0 %}
+                            <form method="POST" action="{% url 'registrar_emprestimo' livro.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Emprestar
+                                </button>
+                            </form>
+                        
+                        {% else %}
+                            <p class="card-text text-danger"><strong>Indisponível</strong></p>
+                        {% endif %}
+
+                        </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Ainda não há livros cadastrados no acervo.</p>
+    {% endif %}
+    
+    <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Voltar para Página Inicial</a>
+</div>
+{% endblock %}

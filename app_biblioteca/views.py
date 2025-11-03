@@ -5,6 +5,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 # Decorador para proteger páginas
 from django.contrib.auth.decorators import login_required
+from .models import Livro, Emprestimo
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib import messages
 
 def login_view(request):
     # Se o usuário já estiver logado, redireciona para a home
@@ -42,3 +48,77 @@ def logout_view(request):
 @login_required(login_url='login') # Se tentar acessar sem estar logado, redireciona para a URL de nome 'login'
 def home(request):
     return render(request, 'home.html')
+
+@login_required(login_url='login')
+def listar_livros(request):
+    # 1. Busca todos os objetos Livro no banco de dados, ordenados por título
+    livros = Livro.objects.all().order_by('titulo')
+    
+    # 2. Cria um "contexto" (um dicionário) para enviar os dados para o template
+    contexto = {
+        'livros': livros
+    }
+    
+    # 3. Renderiza o template 'livros/livros.html' e passa o contexto para ele
+    return render(request, 'livros/livros.html', contexto)
+
+@require_POST  # Garante que esta view só aceite requisições POST
+@login_required(login_url='login') # Garante que o usuário esteja logado
+def registrar_emprestimo(request, livro_id):
+
+    # 1. Busca o livro pelo ID. Se não encontrar, retorna "Página não encontrada"
+    livro = get_object_or_404(Livro, id=livro_id)
+
+    # 2. Pega o usuário que está logado
+    usuario = request.user
+
+    # 3. VERIFICAÇÃO: Checa se o livro tem estoque
+    if livro.estoque > 0:
+
+        # 4. Diminui o estoque e salva o livro
+        livro.estoque -= 1
+        livro.save()
+
+        # 5. Define a data de devolução (ex: 7 dias a partir de hoje)
+        data_prevista = timezone.now().date() + timedelta(days=7)
+
+        # 6. Cria o novo registro de Empréstimo no banco de dados
+        Emprestimo.objects.create(
+            livro=livro,
+            usuario=usuario,
+            data_devolucao_prevista=data_prevista
+        )
+
+        messages.success(
+            request,
+            f'O livro "{livro.titulo}" foi emprestado com sucesso! '
+            f'Deve ser devolvido até {data_prevista.strftime("%d/%m/%Y")}.'
+        )
+
+
+    else:
+        messages.error(
+            request,
+            f'O livro "{livro.titulo}" não está disponível no momento (sem estoque).'
+        )
+        pass
+
+    # 7. Redireciona o usuário de volta para a lista de livros
+    return redirect('listar_livros')
+
+@login_required(login_url='login')
+def listar_emprestimos_ativos(request):
+    # TODO: Futuramente, esta página será restrita somente para Funcionários. Mas, por enquanto, qualquer usuário logado pode ver.
+    
+    # 1. Busca todos os Emprestimos onde a data_devolucao É NULA (isnull=True)
+    # e ordena pela data de devolução prevista.
+    emprestimos_ativos = Emprestimo.objects.filter(
+        data_devolucao__isnull=True
+    ).order_by('data_devolucao_prevista')
+    
+    contexto = {
+        'emprestimos': emprestimos_ativos
+    }
+    
+    # TODO: 2. Renderiza um NOVO template que ainda será criado 
+    return render(request, 'emprestimos/listar_ativos.html', contexto)

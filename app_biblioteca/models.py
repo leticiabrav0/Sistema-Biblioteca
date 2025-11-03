@@ -1,11 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, User
-
-# Classe feita para estudo, não utilizada no projeto
-# class Usuario(models.Model):
-    # id_usuario = models.AutoField(primary_key=True)
-    # nome_usuario = models.TextField(max_length=150)
-    # senha_usuario = models.TextField(max_length=100)
+from django.conf import settings
 
 class Usuario(AbstractUser):
     pass 
@@ -29,9 +24,10 @@ class Livro(models.Model):
 
 class Emprestimo(models.Model):
     livro = models.ForeignKey(Livro, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     data_emprestimo = models.DateField(auto_now_add=True)
+    data_devolucao_prevista = models.DateField()
     data_devolucao = models.DateField(null=True, blank=True)
-    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
     
     def __str__(self):
-        return f'{self.usuario} - {self.livro}'
+        return f'{self.usuario.username} - {self.livro.titulo}'
