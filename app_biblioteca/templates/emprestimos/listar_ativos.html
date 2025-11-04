@@ -24,9 +24,12 @@
                     <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
                     <td style="color: red; font-weight: bold;">{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
                     <td>
-                        <button class="btn btn-primary btn-sm" disabled> <!-- BOTÃO DESABILITADO TEMPORARIAMENTE -->>
-                            Registrar Devolução
-                        </button>
+                        <form method="POST" action="{% url 'registrar_devolucao' emprestimo.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                Registrar Devolução
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}

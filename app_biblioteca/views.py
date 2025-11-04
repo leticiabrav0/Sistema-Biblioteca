@@ -122,3 +122,32 @@ def listar_emprestimos_ativos(request):
     
     # TODO: 2. Renderiza um NOVO template que ainda será criado 
     return render(request, 'emprestimos/listar_ativos.html', contexto)
+
+@require_POST
+@login_required(login_url='login')
+def registrar_devolucao(request, emprestimo_id):
+    # 1. Busca o empréstimo pelo ID. Se não encontrar, retorna "Página não encontrada"
+    emprestimo = get_object_or_404(Emprestimo, id=emprestimo_id)
+
+    # 2. VERIFICAÇÃO: Checa se o empréstimo já foi devolvido. Pega o livro associado a este empréstimo
+    if emprestimo.data_devolucao is not None:
+        messages.error(request, 'Este empréstimo já foi devolvido.')
+        return redirect('listar_emprestimos_ativos')
+    
+    livro = emprestimo.livro
+
+    # 3. Define a data de devolução como "agora"
+    emprestimo.data_devolucao = timezone.now().date()
+    emprestimo.save()
+
+    # 4. Aumenta o estoque do livro de volta
+    livro.estoque += 1
+    livro.save()
+
+    messages.success(
+        request,
+        f"Devolução do livro '{livro.titulo}' registrada com sucesso!"
+    )
+
+    # 6. Redireciona o usuário de volta para a lista de empréstimos ativos
+    return redirect('listar_emprestimos_ativos')
